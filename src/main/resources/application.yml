@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/store
+    username: root
+    password: root
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: javaitspace@gmail.com
+    password: ylfj tpdn xwmw qltd
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+
+  liquibase:
+    change-log: classpath*:db/ch.xml
+
+
+si:
+  massage:
+    active:
+      url: http://localhost:8080/user/confirmation?token=
+
+image:
+  package:
+     url: C:\Users\User\IdeaProjects\Clothing-and-accessories-store\images
+
+jwt:
+  secret: bXlTdXBlclNlY3JldEtleUZvckpXdFRva2VuU2hvdWxkQmVMb25nRW5vdWdoMTIzNDU=
+  expiration: 36000000
