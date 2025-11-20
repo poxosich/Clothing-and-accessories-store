@@ -9,5 +9,4 @@ import org.mapstruct.Mapper;
 public interface UserMapper {
     User toRequestEntity(UserRequest userRequest);
     UserResponse toDtoResponse(User user);
-    UserRequest toDtoRequest(User user);
 }

@@ -1,11 +1,9 @@
 package com.example.clothingandaccessoriesstore.service.impl;
 
-import com.example.clothingandaccessoriesstore.dto.liked.LikedRequestDto;
 import com.example.clothingandaccessoriesstore.dto.liked.LikedResponseDto;
 import com.example.clothingandaccessoriesstore.dto.product.ProductResponseDto;
 import com.example.clothingandaccessoriesstore.entity.Liked;
 import com.example.clothingandaccessoriesstore.entity.User;
-import com.example.clothingandaccessoriesstore.exeption.LikedDublinException;
 import com.example.clothingandaccessoriesstore.exeption.ProductNotFoundException;
 import com.example.clothingandaccessoriesstore.exeption.UserNotFoundException;
 import com.example.clothingandaccessoriesstore.map.liked.LikedMapper;

@@ -2,17 +2,14 @@ package com.example.clothingandaccessoriesstore.service.impl;
 
 import com.example.clothingandaccessoriesstore.dto.category.CategoryRequestDto;
 import com.example.clothingandaccessoriesstore.dto.category.CategoryResponseDto;
-import com.example.clothingandaccessoriesstore.dto.product.ProductResponseDto;
 import com.example.clothingandaccessoriesstore.entity.Category;
 import com.example.clothingandaccessoriesstore.entity.Product;
 import com.example.clothingandaccessoriesstore.exeption.CategoryDuplicateException;
 import com.example.clothingandaccessoriesstore.exeption.CategoryNotFoundException;
 import com.example.clothingandaccessoriesstore.map.category.CategoryMapper;
-import com.example.clothingandaccessoriesstore.map.product.ProductMapper;
 import com.example.clothingandaccessoriesstore.repository.CategoryRepository;
 import com.example.clothingandaccessoriesstore.repository.ProductRepository;
 import com.example.clothingandaccessoriesstore.service.CategoryService;
-import com.example.clothingandaccessoriesstore.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

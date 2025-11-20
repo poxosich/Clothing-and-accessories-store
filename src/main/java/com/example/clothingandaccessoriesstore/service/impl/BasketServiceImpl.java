@@ -40,7 +40,7 @@ public class BasketServiceImpl implements BasketService {
             User userByEmail = userService.findUserByEmail(email);
             ProductResponseDto productById = productService.getProductById(productid);
             if (productById == null) {
-                System.out.println("nall");
+                throw new ProductNotFoundException("Product not found");
             }
             Basket save = basketRepository.save(Basket.builder()
                     .product(productMapper.fromResponseDto(productById))

@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class EmailNotActiveExceptionHandler {
     @ExceptionHandler(EmailNotActiveException.class)
     public ResponseEntity<String> handleEmailNotActive(EmailNotActiveException exception) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Email not active please firm email");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
     }
 }

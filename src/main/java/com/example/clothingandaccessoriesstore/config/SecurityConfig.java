@@ -1,9 +1,9 @@
 package com.example.clothingandaccessoriesstore.config;
 
 import com.example.clothingandaccessoriesstore.entity.Role;
-import com.example.clothingandaccessoriesstore.security.JwtAuthenticationEntryPoint;
 import com.example.clothingandaccessoriesstore.security.JwtRequestFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,6 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtRequestFilter jwtRequestFilter;
+    @Value("${front.url}")
+    private String frontendURL;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -34,7 +36,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/category/add").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.DELETE, "/category/delete/{id}").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.GET, "/category/getAll").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/product").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.POST, "/product").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/product/delete/{id}").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.DELETE, "/product/update").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.GET, "/product/get15Product").permitAll()
@@ -62,7 +64,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of(frontendURL));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

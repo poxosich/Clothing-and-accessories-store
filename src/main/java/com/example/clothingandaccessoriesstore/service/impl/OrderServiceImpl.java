@@ -4,7 +4,6 @@ import com.example.clothingandaccessoriesstore.dto.basket.BasketResponseDto;
 import com.example.clothingandaccessoriesstore.dto.order.OrderRequestDto;
 import com.example.clothingandaccessoriesstore.dto.order.OrderResponseDto;
 import com.example.clothingandaccessoriesstore.dto.product.ProductResponseDto;
-import com.example.clothingandaccessoriesstore.entity.Basket;
 import com.example.clothingandaccessoriesstore.entity.Order;
 import com.example.clothingandaccessoriesstore.entity.User;
 import com.example.clothingandaccessoriesstore.exeption.ProductNotFoundException;
@@ -68,15 +67,15 @@ public class OrderServiceImpl implements OrderService {
                 for (BasketResponseDto basketResponseDto : baskedByEmail) {
                     ProductResponseDto productById = productService.getProductById(basketResponseDto.getProduct().getId());
                     orderRepository.save(Order.builder()
-                                    .product(productMapper.fromResponseDto(productById))
-                                    .user(userByEmail)
-                                    .quantity(basketResponseDto.getQuantity())
-                                    .totalPrice(orderRequestDto.getTotalPrice())
-                                    .localDateTime(LocalDateTime.now())
+                            .product(productMapper.fromResponseDto(productById))
+                            .user(userByEmail)
+                            .quantity(basketResponseDto.getQuantity())
+                            .totalPrice(orderRequestDto.getTotalPrice())
+                            .localDateTime(LocalDateTime.now())
                             .build());
                 }
             }
-        }catch (UsernameNotFoundException e) {
+        } catch (UsernameNotFoundException e) {
             throw new UserNotFoundException("User not found");
         }
     }

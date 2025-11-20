@@ -7,13 +7,13 @@ import com.example.clothingandaccessoriesstore.exeption.CategoryNotFoundExceptio
 import com.example.clothingandaccessoriesstore.exeption.ProductNotFoundException;
 import com.example.clothingandaccessoriesstore.map.category.CategoryMapper;
 import com.example.clothingandaccessoriesstore.map.product.ProductMapper;
+import com.example.clothingandaccessoriesstore.repository.BasketRepository;
+import com.example.clothingandaccessoriesstore.repository.LikedRepository;
 import com.example.clothingandaccessoriesstore.repository.ProductRepository;
 import com.example.clothingandaccessoriesstore.service.CategoryService;
 import com.example.clothingandaccessoriesstore.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +32,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final CategoryMapper categoryMapper;
     private final ProductRepository productRepository;
+    private final LikedRepository likedRepository;
+    private final BasketRepository basketRepository;
     @Value("${image.package.url}")
     private String path;
 
@@ -85,33 +87,36 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void deleteProductById(Integer id) {
         Optional<Product> byId = productRepository.findById(id);
         if (byId.isEmpty()) {
             throw new ProductNotFoundException("product not found");
         }
+        likedRepository.deleteByProductId(id);
+        basketRepository.deleteBasketByProductId(id);
         productRepository.deleteById(id);
     }
 
     @Override
     public ProductResponseDto updateProduct(int id, MultipartFile multipartFile, String name, double price, int categoryId, String description, int quantity) {
-        Optional<Product> byId = productRepository.findById(id);
-        if (byId.isEmpty()) {
+        Optional<Product> productById = productRepository.findById(id);
+        if (productById.isEmpty()) {
             throw new ProductNotFoundException("product not found");
         }
         CategoryResponseDto categoryById = categoryService.getCategoryById(categoryId);
         if (categoryById == null) {
             throw new CategoryNotFoundException("category not found");
         }
-        byId.get().setName(name);
-        byId.get().setPrice(price);
-        byId.get().setPicture(addPictureToFolder(multipartFile));
-        byId.get().setCategory(categoryMapper.toEntity2(categoryById));
-        byId.get().setDateTime(LocalDateTime.now());
-        byId.get().setDescription(description);
-        byId.get().setQuantity(quantity);
-        productMapper.toResponseDto(productRepository.save(byId.get()));
-        return productMapper.toResponseDto(byId.get());
+        productById.get().setName(name);
+        productById.get().setPrice(price);
+        productById.get().setPicture(addPictureToFolder(multipartFile));
+        productById.get().setCategory(categoryMapper.toEntity2(categoryById));
+        productById.get().setDateTime(LocalDateTime.now());
+        productById.get().setDescription(description);
+        productById.get().setQuantity(quantity);
+        productMapper.toResponseDto(productRepository.save(productById.get()));
+        return productMapper.toResponseDto(productById.get());
     }
 
     @Override

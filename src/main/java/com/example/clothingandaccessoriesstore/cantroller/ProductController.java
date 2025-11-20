@@ -1,7 +1,6 @@
 package com.example.clothingandaccessoriesstore.cantroller;
 
 import com.example.clothingandaccessoriesstore.dto.product.ProductResponseDto;
-import com.example.clothingandaccessoriesstore.map.product.ProductMapper;
 import com.example.clothingandaccessoriesstore.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
