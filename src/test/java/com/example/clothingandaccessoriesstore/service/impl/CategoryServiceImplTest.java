@@ -4,6 +4,8 @@ import com.example.clothingandaccessoriesstore.dto.category.CategoryRequestDto;
 import com.example.clothingandaccessoriesstore.dto.category.CategoryResponseDto;
 import com.example.clothingandaccessoriesstore.entity.Category;
 import com.example.clothingandaccessoriesstore.entity.Product;
+import com.example.clothingandaccessoriesstore.exeption.CategoryDuplicateException;
+import com.example.clothingandaccessoriesstore.exeption.CategoryNotFoundException;
 import com.example.clothingandaccessoriesstore.map.category.CategoryMapper;
 import com.example.clothingandaccessoriesstore.repository.CategoryRepository;
 import com.example.clothingandaccessoriesstore.repository.ProductRepository;
@@ -50,6 +52,17 @@ class CategoryServiceImplTest {
         assertThat(categoryResponseDtoService).isSameAs(categoryResponseDto);
     }
 
+    @Test
+    void saveCategoryDuplicateCategory() {
+        CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
+        categoryRequestDto.setName("fffff");
+        Category category = new Category();
+
+        when(categoryRepository.findCategoryByName(categoryRequestDto.getName())).thenReturn(Optional.of(category));
+
+        assertThrows(CategoryDuplicateException.class, () -> categoryService.saveCategory(categoryRequestDto));
+    }
+
 
     @Test
     void deleteCategoryById() {
@@ -69,6 +82,13 @@ class CategoryServiceImplTest {
         verify(categoryRepository).deleteById(categoryId);
     }
 
+    @Test
+    void deleteCategoryByIdCategoryNotFound() {
+        int categoryId = 1;
+        when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+        assertThrows(CategoryNotFoundException.class, () -> categoryService.deleteCategoryById(categoryId));
+    }
 
     @Test
     void getAllCategories() {
@@ -98,5 +118,14 @@ class CategoryServiceImplTest {
         CategoryResponseDto categoryResponseDto = categoryService.getCategoryById(categoryId);
 
         assertThat(categoryResponseDto).isSameAs(dto);
+    }
+
+    @Test
+    void getCategoryByIdCategoryNotFound() {
+        int categoryId = 1;
+
+        when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+        assertThrows(CategoryNotFoundException.class, () -> categoryService.getCategoryById(categoryId));
     }
 }

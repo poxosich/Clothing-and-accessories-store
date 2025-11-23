@@ -6,10 +6,12 @@ import com.example.clothingandaccessoriesstore.dto.product.ProductResponseDto;
 import com.example.clothingandaccessoriesstore.entity.Basket;
 import com.example.clothingandaccessoriesstore.entity.Product;
 import com.example.clothingandaccessoriesstore.entity.User;
+import com.example.clothingandaccessoriesstore.exeption.BasketDuplicateException;
+import com.example.clothingandaccessoriesstore.exeption.ProductNotFoundException;
+import com.example.clothingandaccessoriesstore.exeption.UserNotFoundException;
 import com.example.clothingandaccessoriesstore.map.basket.BasketMapper;
 import com.example.clothingandaccessoriesstore.map.product.ProductMapper;
 import com.example.clothingandaccessoriesstore.repository.BasketRepository;
-import com.example.clothingandaccessoriesstore.service.BasketService;
 import com.example.clothingandaccessoriesstore.service.ProductService;
 import com.example.clothingandaccessoriesstore.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -22,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -68,6 +70,37 @@ class BasketServiceImplTest {
         assertThat(response).isSameAs(expectedResponse);
     }
 
+    @Test
+    void addBasketIsFound() {
+        int productId = 1;
+        String email = "cholakyanars4@gmail.com";
+        Basket Basket = new Basket();
+
+        when(basketRepository.findBasketByProductIdAndUserEmail(productId, email)).thenReturn(Optional.of(Basket));
+
+        assertThrows(BasketDuplicateException.class, () -> basketService.addBasket(productId, email));
+    }
+
+    @Test
+    void addBasketUserNotFound() {
+        int productId = 1;
+        String email = "cholakyanars4@gmail.com";
+
+        when(userService.findUserByEmail(email)).thenThrow(new UserNotFoundException(email));
+
+        assertThrows(UserNotFoundException.class, () -> basketService.addBasket(productId, email));
+    }
+
+    @Test
+    void addBasketProductNotFound() {
+        int productId = 1;
+        String email = "cholakyanars4@gmail.com";
+
+        when(productService.getProductById(productId)).thenReturn(null);
+
+        assertThrows(ProductNotFoundException.class, () -> basketService.addBasket(productId, email));
+    }
+
 
     @Test
     void getBaskedByEmail() {
@@ -80,6 +113,8 @@ class BasketServiceImplTest {
     }
 
 
+
+
     @Test
     void deleteBasket() {
         int productId = 1;
@@ -89,6 +124,24 @@ class BasketServiceImplTest {
         when(productService.getProductById(productId)).thenReturn(productResponseDto);
         basketService.deleteBasket(productId, email);
         verify(basketRepository).deleteBasketByProductIdAndUserEmail(productId, email);
+    }
+
+    @Test
+    void deleteBasketUserNotFound() {
+        int productId = 1;
+        String email = "cholakyanars4@gmail.com";
+      when(userService.findUserByEmail(email)).thenThrow(new UserNotFoundException(email));
+
+      assertThrows(UserNotFoundException.class, () -> basketService.deleteBasket(productId, email));
+    }
+
+    @Test
+    void deleteBasketProductNotFound() {
+        int productId = 1;
+        String email = "cholakyanars4@gmail.com";
+        when(productService.getProductById(productId)).thenReturn(null);
+
+        assertThrows(ProductNotFoundException.class, () -> basketService.deleteBasket(productId, email));
     }
 
 
