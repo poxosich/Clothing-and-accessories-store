@@ -77,8 +77,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDto> getAllProducts() {
-        return productMapper.toResponseDtoList(productRepository.findAll());
+    public List<ProductResponseDto> getAllProducts(Pageable pageable) {
+        return productMapper.toResponseDtoList(productRepository.findAllByOrderByIdDesc(pageable));
     }
 
     @Override
@@ -100,23 +100,20 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseDto updateProduct(int id, MultipartFile multipartFile, String name, double price, int categoryId, String description, int quantity) {
-        Optional<Product> productById = productRepository.findById(id);
-        if (productById.isEmpty()) {
-            throw new ProductNotFoundException("product not found");
-        }
+        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("product not found"));
         CategoryResponseDto categoryById = categoryService.getCategoryById(categoryId);
         if (categoryById == null) {
             throw new CategoryNotFoundException("category not found");
         }
-        productById.get().setName(name);
-        productById.get().setPrice(price);
-        productById.get().setPicture(addPictureToFolder(multipartFile));
-        productById.get().setCategory(categoryMapper.toEntity2(categoryById));
-        productById.get().setDateTime(LocalDateTime.now());
-        productById.get().setDescription(description);
-        productById.get().setQuantity(quantity);
-        productMapper.toResponseDto(productRepository.save(productById.get()));
-        return productMapper.toResponseDto(productById.get());
+        product.setName(name);
+        product.setPrice(price);
+        product.setPicture(addPictureToFolder(multipartFile));
+        product.setCategory(categoryMapper.toEntity2(categoryById));
+        product.setDateTime(LocalDateTime.now());
+        product.setDescription(description);
+        product.setQuantity(quantity);
+        Product savedProduct = productRepository.save(product);
+        return productMapper.toResponseDto(savedProduct);
     }
 
     @Override

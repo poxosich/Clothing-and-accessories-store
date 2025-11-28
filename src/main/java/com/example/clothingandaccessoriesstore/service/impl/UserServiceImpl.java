@@ -35,19 +35,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUserByEmail(String email) {
-        String normalizedEmail = email == null ? null : email.trim().toLowerCase();
-        return userRepository.findUserByEmail(normalizedEmail).orElseThrow(() -> new UserNotFoundException("User not found"));
+        return userRepository.findUserByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     @Override
     public UserResponse saveUser(UserRequest userRequest) {
         String token = UUID.randomUUID().toString();
-        userRequest.setEmail(userRequest.getEmail() == null ? null : userRequest.getEmail().trim().toLowerCase());
+        Optional<User> userByEmail = userRepository.findUserByEmail(userRequest.getEmail());
+        if (userByEmail.isPresent()) {
+            throw new UserDublinException(USER_DUBLIN);
+        }
+        userRequest.setEmail(userRequest.getEmail());
         userRequest.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         userRequest.setToken(token);
         userRequest.setRole(Role.USER);
-        User save = userRepository.save(userMapper.toRequestEntity(userRequest));
-        return userMapper.toDtoResponse(save);
+        User savedUser = userRepository.save(userMapper.toRequestEntity(userRequest));
+        return userMapper.toDtoResponse(savedUser);
     }
 
 

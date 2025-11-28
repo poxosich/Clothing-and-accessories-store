@@ -1,4 +1,4 @@
-package com.example.clothingandaccessoriesstore.cantroller;
+package com.example.clothingandaccessoriesstore.controller;
 
 import com.example.clothingandaccessoriesstore.dto.liked.LikedResponseDto;
 import com.example.clothingandaccessoriesstore.service.LikedService;
@@ -14,14 +14,14 @@ import java.util.List;
 public class LikedController {
     private final LikedService likedService;
 
-    @PostMapping("/add")
-    public LikedResponseDto addLiked(@RequestParam int productId, @RequestParam String email) {
-        return likedService.add(productId, email);
+    @PostMapping()
+    public LikedResponseDto addLiked(@RequestParam int productId) {
+        return likedService.add(productId);
     }
 
-    @GetMapping("/get/{email}")
-    public ResponseEntity<List<LikedResponseDto>> getLiked(@PathVariable String email) {
-        return ResponseEntity.ok(likedService.getLiked(email));
+    @GetMapping("/get")
+    public ResponseEntity<List<LikedResponseDto>> getLiked() {
+        return ResponseEntity.ok(likedService.getLiked());
     }
 
     @DeleteMapping("/delete")
@@ -29,5 +29,4 @@ public class LikedController {
         likedService.deleteLiked(productId, email);
         return ResponseEntity.ok("deleted");
     }
-
 }

@@ -14,6 +14,7 @@ import com.example.clothingandaccessoriesstore.map.product.ProductMapper;
 import com.example.clothingandaccessoriesstore.repository.BasketRepository;
 import com.example.clothingandaccessoriesstore.service.ProductService;
 import com.example.clothingandaccessoriesstore.service.UserService;
+import com.example.clothingandaccessoriesstore.util.JwtTokenUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -45,6 +46,8 @@ class BasketServiceImplTest {
 
     @Mock
     private BasketMapper basketMapper;
+    @Mock
+    private JwtTokenUtil jwtTokenUtil;
 
     @InjectMocks
     private BasketServiceImpl basketService;
@@ -59,13 +62,15 @@ class BasketServiceImplTest {
         Basket savedBasket = new Basket();
         BasketResponseDto expectedResponse = new BasketResponseDto();
 
+        when(jwtTokenUtil.getCurrentUserEmail()).thenReturn(email);
         when(basketRepository.findBasketByProductIdAndUserEmail(productId, email)).thenReturn(Optional.empty());
         when(userService.findUserByEmail(email)).thenReturn(user);
         when(productService.getProductById(productId)).thenReturn(productResponseDto);
         when(productMapper.fromResponseDto(productResponseDto)).thenReturn(product);
         when(basketRepository.save(any(Basket.class))).thenReturn(savedBasket);
         when(basketMapper.toResponseDto(savedBasket)).thenReturn(expectedResponse);
-        BasketResponseDto response = basketService.addBasket(productId, email);
+
+        BasketResponseDto response = basketService.addBasket(productId);
 
         assertThat(response).isSameAs(expectedResponse);
     }
@@ -76,9 +81,10 @@ class BasketServiceImplTest {
         String email = "cholakyanars4@gmail.com";
         Basket Basket = new Basket();
 
+        when(jwtTokenUtil.getCurrentUserEmail()).thenReturn(email);
         when(basketRepository.findBasketByProductIdAndUserEmail(productId, email)).thenReturn(Optional.of(Basket));
 
-        assertThrows(BasketDuplicateException.class, () -> basketService.addBasket(productId, email));
+        assertThrows(BasketDuplicateException.class, () -> basketService.addBasket(productId));
     }
 
     @Test
@@ -86,33 +92,33 @@ class BasketServiceImplTest {
         int productId = 1;
         String email = "cholakyanars4@gmail.com";
 
+        when(jwtTokenUtil.getCurrentUserEmail()).thenReturn(email);
         when(userService.findUserByEmail(email)).thenThrow(new UserNotFoundException(email));
 
-        assertThrows(UserNotFoundException.class, () -> basketService.addBasket(productId, email));
+        assertThrows(UserNotFoundException.class, () -> basketService.addBasket(productId));
     }
 
     @Test
     void addBasketProductNotFound() {
         int productId = 1;
-        String email = "cholakyanars4@gmail.com";
 
         when(productService.getProductById(productId)).thenReturn(null);
 
-        assertThrows(ProductNotFoundException.class, () -> basketService.addBasket(productId, email));
+        assertThrows(ProductNotFoundException.class, () -> basketService.addBasket(productId));
     }
-
 
     @Test
     void getBaskedByEmail() {
         String email = "cholakyanars4@gmail.com";
-        List<BasketResponseDto> response = List.of(new BasketResponseDto(),  new BasketResponseDto());
-        List<Basket> baskets = List.of(new Basket(),  new Basket());
+        List<BasketResponseDto> response = List.of(new BasketResponseDto(), new BasketResponseDto());
+        List<Basket> baskets = List.of(new Basket(), new Basket());
+
+        when(jwtTokenUtil.getCurrentUserEmail()).thenReturn(email);
         when(basketRepository.findBasketByUserEmail(email)).thenReturn(baskets);
         when(basketMapper.toResponseDtoList(baskets)).thenReturn(response);
-        assertThat(basketService.getBaskedByEmail(email)).isEqualTo(response);
+
+        assertThat(basketService.getBaskedByEmail()).isEqualTo(response);
     }
-
-
 
 
     @Test
@@ -120,9 +126,11 @@ class BasketServiceImplTest {
         int productId = 1;
         String email = "cholakyanars4@gmail.com";
         ProductResponseDto productResponseDto = new ProductResponseDto();
-        when(userService.findUserByEmail(email)).thenReturn(new  User());
+        when(userService.findUserByEmail(email)).thenReturn(new User());
         when(productService.getProductById(productId)).thenReturn(productResponseDto);
+
         basketService.deleteBasket(productId, email);
+
         verify(basketRepository).deleteBasketByProductIdAndUserEmail(productId, email);
     }
 
@@ -130,9 +138,10 @@ class BasketServiceImplTest {
     void deleteBasketUserNotFound() {
         int productId = 1;
         String email = "cholakyanars4@gmail.com";
-      when(userService.findUserByEmail(email)).thenThrow(new UserNotFoundException(email));
 
-      assertThrows(UserNotFoundException.class, () -> basketService.deleteBasket(productId, email));
+        when(userService.findUserByEmail(email)).thenThrow(new UserNotFoundException(email));
+
+        assertThrows(UserNotFoundException.class, () -> basketService.deleteBasket(productId, email));
     }
 
     @Test
@@ -165,5 +174,6 @@ class BasketServiceImplTest {
         when(basketRepository.findBasketByProductIdAndUserEmail(requestDto.getProduct().getId(), requestDto.getUser().getEmail())).thenReturn(Optional.of(existingBasket));
         existingBasket.setQuantity(4);
         basketService.updateBasket(requestDto);
-        verify(basketRepository).save(existingBasket);    }
+        verify(basketRepository).save(existingBasket);
+    }
 }

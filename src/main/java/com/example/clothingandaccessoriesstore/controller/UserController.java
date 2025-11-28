@@ -1,4 +1,4 @@
-package com.example.clothingandaccessoriesstore.cantroller;
+package com.example.clothingandaccessoriesstore.controller;
 
 import com.example.clothingandaccessoriesstore.dto.user.AuthorizationRequest;
 import com.example.clothingandaccessoriesstore.dto.user.AuthorizationResponse;

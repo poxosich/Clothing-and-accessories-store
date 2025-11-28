@@ -12,7 +12,7 @@ import com.example.clothingandaccessoriesstore.map.product.ProductMapper;
 import com.example.clothingandaccessoriesstore.repository.LikedRepository;
 import com.example.clothingandaccessoriesstore.service.ProductService;
 import com.example.clothingandaccessoriesstore.service.UserService;
-import lombok.extern.slf4j.Slf4j;
+import com.example.clothingandaccessoriesstore.util.JwtTokenUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@Slf4j
 @ExtendWith(MockitoExtension.class)
 class LikedServiceImplTest {
     @Mock
@@ -40,6 +39,8 @@ class LikedServiceImplTest {
     ProductMapper productMapper;
     @Mock
     LikedMapper likedMapper;
+    @Mock
+    JwtTokenUtil jwtTokenUtil;
 
     @InjectMocks
     LikedServiceImpl likedServiceImpl;
@@ -75,10 +76,12 @@ class LikedServiceImplTest {
         Liked liked2 = new Liked();
         LikedResponseDto likedResponseDto = new LikedResponseDto();
         LikedResponseDto likedResponseDto2 = new LikedResponseDto();
+
+        when(jwtTokenUtil.getCurrentUserEmail()).thenReturn(email);
         when(likedRepository.findLikedByUserEmail(email)).thenReturn(List.of(liked, liked2));
         when(likedMapper.toResponseDtoList(List.of(liked, liked2))).thenReturn(List.of(likedResponseDto, likedResponseDto2));
 
-        List<LikedResponseDto> responseEntity = likedServiceImpl.getLiked(email);
+        List<LikedResponseDto> responseEntity = likedServiceImpl.getLiked();
 
         assertThat(responseEntity).isEqualTo(List.of(likedResponseDto, likedResponseDto2));
     }
@@ -95,6 +98,7 @@ class LikedServiceImplTest {
         Liked saved = new Liked();
         LikedResponseDto response = new LikedResponseDto();
 
+        when(jwtTokenUtil.getCurrentUserEmail()).thenReturn(email);
         when(likedRepository.findByProductIdAndUserEmail(productId, email)).thenReturn(Optional.empty());
         when(userService.findUserByEmail(email)).thenReturn(user);
         when(productService.getProductById(productId)).thenReturn(productDto);
@@ -102,7 +106,7 @@ class LikedServiceImplTest {
         when(likedRepository.save(any(Liked.class))).thenReturn(saved);
         when(likedMapper.toResponseDto(saved)).thenReturn(response);
 
-        LikedResponseDto result = likedServiceImpl.add(productId, email);
+        LikedResponseDto result = likedServiceImpl.add(productId);
 
         assertThat(result).isEqualTo(response);
     }
@@ -114,10 +118,11 @@ class LikedServiceImplTest {
         Liked liked = new Liked();
         LikedResponseDto likedResponseDto = new LikedResponseDto();
 
+        when(jwtTokenUtil.getCurrentUserEmail()).thenReturn(email);
         when(likedRepository.findByProductIdAndUserEmail(productId, email)).thenReturn(Optional.of(liked));
         when(likedMapper.toResponseDto(liked)).thenReturn(likedResponseDto);
 
-        LikedResponseDto add = likedServiceImpl.add(productId, email);
+        LikedResponseDto add = likedServiceImpl.add(productId);
 
         verify(likedRepository).delete(liked);
 
@@ -130,9 +135,10 @@ class LikedServiceImplTest {
         int productId = 1;
         String email = "cholakyanars4@gmail.com";
 
+        when(jwtTokenUtil.getCurrentUserEmail()).thenReturn(email);
         when(userService.findUserByEmail(email)).thenThrow(new UserNotFoundException(email));
 
-        assertThrows(UserNotFoundException.class, () -> likedServiceImpl.add(productId, email));
+        assertThrows(UserNotFoundException.class, () -> likedServiceImpl.add(productId));
     }
 
     @Test
@@ -141,10 +147,11 @@ class LikedServiceImplTest {
         String email = "cholakyanars4@gmail.com";
         User user = new User();
 
+        when(jwtTokenUtil.getCurrentUserEmail()).thenReturn(email);
         when(userService.findUserByEmail(email)).thenReturn(user);
         when(productService.getProductById(productId)).thenReturn(null);
 
-        assertThrows(UserNotFoundException.class, () -> likedServiceImpl.add(productId, email));
+        assertThrows(UserNotFoundException.class, () -> likedServiceImpl.add(productId));
 
         verify(likedRepository, never()).save(any(Liked.class));
     }

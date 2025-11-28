@@ -16,7 +16,9 @@ import com.example.clothingandaccessoriesstore.service.BasketService;
 import com.example.clothingandaccessoriesstore.service.OrderService;
 import com.example.clothingandaccessoriesstore.service.ProductService;
 import com.example.clothingandaccessoriesstore.service.UserService;
+import com.example.clothingandaccessoriesstore.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductService productService;
     private final ProductMapper productMapper;
     private final OrderMapper orderMapper;
+    private final JwtTokenUtil  jwtTokenUtil;
 
     @Override
     public OrderResponseDto addOrder(OrderRequestDto orderRequestDto) {
@@ -55,14 +58,14 @@ public class OrderServiceImpl implements OrderService {
         } catch (UsernameNotFoundException e) {
             throw new UserNotFoundException("User not found");
         }
-
     }
 
     @Override
-    public void addAllOrder(OrderRequestDto orderRequestDto) {
+    public void addAllOrder(int totalPrice) {
+        String email = jwtTokenUtil.getCurrentUserEmail();
         try {
-            User userByEmail = userService.findUserByEmail(orderRequestDto.getUser().getEmail());
-            List<BasketResponseDto> baskedByEmail = basketService.getBaskedByEmail(orderRequestDto.getUser().getEmail());
+            User userByEmail = userService.findUserByEmail(email);
+            List<BasketResponseDto> baskedByEmail = basketService.getBaskedByEmail();
             if (baskedByEmail != null && !baskedByEmail.isEmpty()) {
                 for (BasketResponseDto basketResponseDto : baskedByEmail) {
                     ProductResponseDto productById = productService.getProductById(basketResponseDto.getProduct().getId());
@@ -70,7 +73,7 @@ public class OrderServiceImpl implements OrderService {
                             .product(productMapper.fromResponseDto(productById))
                             .user(userByEmail)
                             .quantity(basketResponseDto.getQuantity())
-                            .totalPrice(orderRequestDto.getTotalPrice())
+                            .totalPrice(totalPrice)
                             .localDateTime(LocalDateTime.now())
                             .build());
                 }
@@ -81,8 +84,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderResponseDto> getAllOrders() {
-        List<Order> all = orderRepository.findAll();
+    public List<OrderResponseDto> getAllOrders(Pageable pageable) {
+        List<Order> all = orderRepository.findAllByOrderByIdDesc(pageable);
         return orderMapper.toDtoList(all);
     }
 }

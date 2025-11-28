@@ -10,7 +10,7 @@ public interface ProductService {
      ProductResponseDto addProduct(MultipartFile multipartFile, String name, double price, int categoryId, String description, int quantity);
      String addPictureToFolder(MultipartFile multipartFile);
      List<ProductResponseDto> findTop15ByOrderByIdDesc();
-     List<ProductResponseDto> getAllProducts();
+     List<ProductResponseDto> getAllProducts(Pageable pageable);
      ProductResponseDto getProductById(Integer id);
      void deleteProductById(Integer id);
      ProductResponseDto updateProduct(int id, MultipartFile multipartFile, String name, double price, int categoryId, String description, int quantity);

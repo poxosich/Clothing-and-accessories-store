@@ -6,8 +6,8 @@ import com.example.clothingandaccessoriesstore.dto.basket.BasketResponseDto;
 import java.util.List;
 
 public interface BasketService {
-    BasketResponseDto addBasket(int productid, String email);
-    List<BasketResponseDto> getBaskedByEmail(String email);
+    BasketResponseDto addBasket(int productid);
+    List<BasketResponseDto> getBaskedByEmail();
     void deleteBasket(int productid, String email);
     void updateBasket(BasketRequestDto requestDto);
 }

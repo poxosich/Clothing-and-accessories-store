@@ -1,4 +1,4 @@
-package com.example.clothingandaccessoriesstore.cantroller;
+package com.example.clothingandaccessoriesstore.controller;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;

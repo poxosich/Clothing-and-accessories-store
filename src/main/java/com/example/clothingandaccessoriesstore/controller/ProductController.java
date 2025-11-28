@@ -1,4 +1,4 @@
-package com.example.clothingandaccessoriesstore.cantroller;
+package com.example.clothingandaccessoriesstore.controller;
 
 import com.example.clothingandaccessoriesstore.dto.product.ProductResponseDto;
 import com.example.clothingandaccessoriesstore.service.ProductService;
@@ -35,8 +35,8 @@ public class ProductController {
     }
 
     @GetMapping("/grtAll")
-    public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<List<ProductResponseDto>> getAllProducts(@PageableDefault(size = 3) Pageable pageable) {
+        return ResponseEntity.ok(productService.getAllProducts(pageable));
     }
 
     @GetMapping("/getById/{id}")
@@ -45,7 +45,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/delete/{id}")
-    private void deleteProductById(@PathVariable Integer id) {
+    private void deleteProductById(@PathVariable int id) {
         productService.deleteProductById(id);
     }
 

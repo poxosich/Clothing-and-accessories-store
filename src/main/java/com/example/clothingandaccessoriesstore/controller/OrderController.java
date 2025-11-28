@@ -1,10 +1,11 @@
-package com.example.clothingandaccessoriesstore.cantroller;
+package com.example.clothingandaccessoriesstore.controller;
 
 import com.example.clothingandaccessoriesstore.dto.order.OrderRequestDto;
 import com.example.clothingandaccessoriesstore.dto.order.OrderResponseDto;
 import com.example.clothingandaccessoriesstore.service.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,18 +16,18 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
 
-    @PostMapping("/add")
+    @PostMapping()
     public void addOrder(@RequestBody OrderRequestDto orderRequestDto) {
         orderService.addOrder(orderRequestDto);
     }
 
     @PostMapping("/addAll")
-    public void addAllOrder(@RequestBody OrderRequestDto orderRequestDto) {
-       orderService.addAllOrder(orderRequestDto);
+    public void addAllOrder(@RequestParam int totalPrice) {
+        orderService.addAllOrder(totalPrice);
     }
 
     @GetMapping("/getAll")
-    public List<OrderResponseDto> getAllOrders() {
-        return orderService.getAllOrders();
+    public List<OrderResponseDto> getAllOrders(@PageableDefault(size = 3) Pageable pageable) {
+        return orderService.getAllOrders(pageable);
     }
 }

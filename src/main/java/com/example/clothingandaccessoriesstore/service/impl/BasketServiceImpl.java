@@ -14,6 +14,7 @@ import com.example.clothingandaccessoriesstore.repository.BasketRepository;
 import com.example.clothingandaccessoriesstore.service.BasketService;
 import com.example.clothingandaccessoriesstore.service.ProductService;
 import com.example.clothingandaccessoriesstore.service.UserService;
+import com.example.clothingandaccessoriesstore.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +30,11 @@ public class BasketServiceImpl implements BasketService {
     private final UserService userService;
     private final ProductService productService;
     private final ProductMapper productMapper;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Override
-    public BasketResponseDto addBasket(int productid, String email) {
+    public BasketResponseDto addBasket(int productid) {
+        String email = jwtTokenUtil.getCurrentUserEmail();
         Optional<Basket> basketByProductIdAndUserEmail = basketRepository.findBasketByProductIdAndUserEmail(productid, email);
         if (basketByProductIdAndUserEmail.isPresent()) {
             throw new BasketDuplicateException("Basket already exists");
@@ -54,7 +57,8 @@ public class BasketServiceImpl implements BasketService {
     }
 
     @Override
-    public List<BasketResponseDto> getBaskedByEmail(String email) {
+    public List<BasketResponseDto> getBaskedByEmail() {
+        String email = jwtTokenUtil.getCurrentUserEmail();
         return basketMapper.toResponseDtoList(basketRepository.findBasketByUserEmail(email));
     }
 

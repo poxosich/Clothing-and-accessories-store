@@ -12,6 +12,7 @@ import com.example.clothingandaccessoriesstore.repository.LikedRepository;
 import com.example.clothingandaccessoriesstore.service.LikedService;
 import com.example.clothingandaccessoriesstore.service.ProductService;
 import com.example.clothingandaccessoriesstore.service.UserService;
+import com.example.clothingandaccessoriesstore.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ public class LikedServiceImpl implements LikedService {
     private final LikedRepository likedRepository;
     private final ProductMapper productMapper;
     private final LikedMapper likedMapper;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Transactional
     public void deleteLiked(int productId, String email) {
@@ -38,14 +40,16 @@ public class LikedServiceImpl implements LikedService {
     }
 
     @Override
-    public List<LikedResponseDto> getLiked(String email) {
+    public List<LikedResponseDto> getLiked() {
+        String email = jwtTokenUtil.getCurrentUserEmail();
         List<Liked> likedByUserEmail = likedRepository.findLikedByUserEmail(email);
         return likedMapper.toResponseDtoList(likedByUserEmail);
     }
 
     @Transactional
     @Override
-    public LikedResponseDto add(int id, String email) {
+    public LikedResponseDto add(int id) {
+        String email = jwtTokenUtil.getCurrentUserEmail();
         Optional<Liked> existingLike = likedRepository.findByProductIdAndUserEmail(id, email);
         if (existingLike.isPresent()) {
             likedRepository.delete(existingLike.get());

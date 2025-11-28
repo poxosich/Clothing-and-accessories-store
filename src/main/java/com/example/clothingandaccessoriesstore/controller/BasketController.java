@@ -1,4 +1,4 @@
-package com.example.clothingandaccessoriesstore.cantroller;
+package com.example.clothingandaccessoriesstore.controller;
 
 import com.example.clothingandaccessoriesstore.dto.basket.BasketRequestDto;
 import com.example.clothingandaccessoriesstore.dto.basket.BasketResponseDto;
@@ -15,14 +15,14 @@ import java.util.List;
 public class BasketController {
     private final BasketService basketService;
 
-    @PostMapping("/add")
-    public ResponseEntity<BasketResponseDto> addBasket(@RequestParam Integer productid, @RequestParam String email) {
-        return ResponseEntity.ok(basketService.addBasket(productid, email));
+    @PostMapping()
+    public ResponseEntity<BasketResponseDto> addBasket(@RequestParam Integer productid) {
+        return ResponseEntity.ok(basketService.addBasket(productid));
     }
 
     @GetMapping("/get")
-    public ResponseEntity<List<BasketResponseDto>> getBasket(@RequestParam String email) {
-        return ResponseEntity.ok(basketService.getBaskedByEmail(email));
+    public ResponseEntity<List<BasketResponseDto>> getBasket() {
+        return ResponseEntity.ok(basketService.getBaskedByEmail());
     }
 
     @DeleteMapping("/delete")

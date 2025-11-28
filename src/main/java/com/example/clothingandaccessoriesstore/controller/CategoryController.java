@@ -1,4 +1,4 @@
-package com.example.clothingandaccessoriesstore.cantroller;
+package com.example.clothingandaccessoriesstore.controller;
 
 import com.example.clothingandaccessoriesstore.dto.category.CategoryRequestDto;
 import com.example.clothingandaccessoriesstore.dto.category.CategoryResponseDto;
@@ -15,7 +15,7 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @PostMapping("/add")
+    @PostMapping()
     public ResponseEntity<CategoryResponseDto> addCategory(@RequestBody CategoryRequestDto categoryRequestDto) {
         CategoryResponseDto categoryResponseDto = categoryService.saveCategory(categoryRequestDto);
         return ResponseEntity.ok(categoryResponseDto);
